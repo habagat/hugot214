@@ -1,51 +1,56 @@
-
-# -----------------------------------------------------------------------------
-# update_select_delete.py
-#
-# -----------------------------------------------------------------------------
-
 from ply import lex, yacc
 
 
 class SqlLexer:
     
-    tokens = [
-        'NAME','INT','FLOAT',
-        'PLUS','MINUS','MUL','DIV','MOD','ASSIGN',
-        'OPENPAR','CLOSEPAR','OPENCURLY','CLOSECURLY','OPENBRACE','CLOSEBRACE'
-       # 'CHARN','BOOLN','STRINGN','ID','COMMA','EOL',
-    ]
 
-    '''reserved = {
-        'ikawna'       :   'IF',
-        'syapala'      :   'ELSE',
-        'akona'        :   'ELSEIF',
-        'kamipa'       :   'WHILE',
-        'ibalik'       :   'RETURN',
-        'tayona'       :   'MAIN',
-        'nbsb'         :   'READ',
+    reserved = {
+        #'ikawna'       :   'IF',
+        #'syapala'      :   'ELSE',
+        #'akona'        :   'ELSEIF',
+        #'kamipa'       :   'WHILE',
+        #'ibalik'       :   'RETURN',
+        #'tayona'       :   'MAIN',
+        #'nbsb'         :   'READ',
         'pda'          :   'PRINT',
-        'paasa'        :   'FOR',
-        'habang'       :   'DO',
-        'solo'         :   'INT',
-        'pafall'       :   'FLOAT',
-        'feelingera'   :   'CHAR',
-        'assumera'     :   'STRING',
-        'friendzone'   :   'BOOLEAN',
-        'lovemosya'    :   'LT',
-        'lovekita'     :   'GT',
-        'maslovemosya' :   'LEQ',
-        'maslovekita'  :   'GEQ',
-        'pataskami'    :   'EQ',
-        'lamangsita'   :   'NEQ',
-        'basted'       :   'NOT',
-        'ot'           :   'OR',
-        'at'           :   'AND',
+        #'paasa'        :   'FOR',
+        #'habang'       :   'DO',
+        #'solo'         :   'INT',
+        #'pafall'       :   'FLOAT',
+        #'feelingera'   :   'CHAR',
+        #'assumera'     :   'STRING',
+        #'friendzone'   :   'BOOLEAN',
+        #'lovemosya'    :   'LT',
+        #'lovekita'     :   'GT',
+        #'maslovemosya' :   'LEQ',
+        #'maslovekita'  :   'GEQ',
+        #'pataskami'    :   'EQ',
+        #'lamangsita'   :   'NEQ',
+        #'basted'       :   'NOT',
+        #'ot'           :   'OR',
+        #'at'           :   'AND',
     }
 
-    tokens += reserved.values()
-    '''
+    tokens = [
+        'INT','FLOAT', 'EOL','ID','STRING',
+        'PLUS','MINUS','MUL','DIV','MOD','ASSIGN',
+        'OPENPAR','CLOSEPAR',
+	#'OPENCURLY','CLOSECURLY','OPENBRACE','CLOSEBRACE'
+       # 'CHARN','BOOLN','STRINGN','ID','COMMA',
+    ] + list(reserved.values())
 
+
+    #tokens += reserved.values()
+    
+ 
+
+    def t_ID(self, t):
+        r'[a-zA-Z_][a-zA-Z_0-9]*'
+        t.type = SqlLexer.reserved.get(t.value,'ID')    # Check for reserved words
+        # redis is case sensitive in hash keys but we want the sql to be case insensitive,
+        # so we lowercase identifiers 
+        t.value = t.value.lower()
+        return t
 
     # Read in a float.  This rule has to be done before the int rule.
     def t_FLOAT(self, t):
@@ -61,15 +66,6 @@ class SqlLexer:
             print("Integer value too large %d", t.value)
             t.value = 0
         return t
-    '''
-    def t_ID(self, t):
-        r'[a-zA-Z_][a-zA-Z_0-9]*'
-        t.type = SqlLexer.reserved.get(t.value,'ID')    # Check for reserved words
-        # redis is case sensitive in hash keys but we want the sql to be case insensitive,
-        # so we lowercase identifiers 
-        t.value = t.value.lower()
-        return t
-
 
     def t_STRING(self, t):
         # TODO: unicode...
@@ -79,14 +75,15 @@ class SqlLexer:
         t.value = eval(t.value)
         t.value[1:-1]
         return t
-      '''
-
+    
     # Tokens
     #t_COMMA       =   r'\,'
-    t_OPENCURLY   =   r'\{'
-    t_CLOSECURLY  =   r'\}'
-    t_OPENBRACE   =   r'\['
-    t_CLOSEBRACE  =   r'\]'
+    t_EOL	  =   r';'
+    #t_QUOTE	  =   r'\"'
+    #t_OPENCURLY   =   r'\{'
+    #t_CLOSECURLY  =   r'\}'
+    #t_OPENBRACE   =   r'\['
+    #t_CLOSEBRACE  =   r'\]'
     t_PLUS        =   r'\+'
     t_MINUS       =   r'-'
     t_MUL         =   r'\*'
@@ -95,14 +92,42 @@ class SqlLexer:
     t_ASSIGN      =   r'='
     t_OPENPAR     =   r'\('
     t_CLOSEPAR    =   r'\)'
-    t_NAME        = r'[a-zA-Z_][a-zA-Z0-9_]*'
 
     # Ignored characters
     t_ignore = " \t"
 
+    literals = [ '{', '}' ]
+
+    def t_lbrace(self, t):
+        r'\{'
+        t.type = '{'      # Set token type to the expected literal
+        return t
+
+    def t_rbrace(self, t):
+        r'\}'
+        t.type = '}'      # Set token type to the expected literal
+        return t
+
+
+    def t_COMMENT(self,t):
+        r'\#.*'
+        pass
+        # No return value. Token discarded
+
     def t_newline(self,t):
         r'\n+'
         t.lexer.lineno += t.value.count("\n")
+
+    
+    # Compute column. 
+    #     input is the input text string
+    #     token is a token instance
+    def find_column(input,token):
+        last_cr = input.rfind('\n',0,token.lexpos)
+        if last_cr < 0:
+            last_cr = 0
+        column = (token.lexpos - last_cr) + 1
+        return column
 
     def t_error(self,t):
         print("Illegal character '%s'" % t.value[0])
@@ -113,6 +138,26 @@ class SqlLexer:
     def build(self, **kwargs):
         self.lexer = lex.lex(module=self, **kwargs)
         return self.lexer
+
+    '''
+    # Test it output
+    def test(self,data):
+        self.lexer.input(data)
+        while True:
+             tok = self.lexer.token()
+             if not tok: 
+                break
+             print(tok)
+    '''
+
+# Build the lexer and try it out
+#m = SqlLexer()
+#m.build()           # Build the lexer
+#m.test("pda () { x1 = [ 4 + 3 ] ; }")     # Test it
+#m.test("#\"hello\"") 
+#m.test("\"Hello World\"")
+#m.test("\'Hi Universe!\'")
+#m.test(" syapala() { \'Hi Universe!\' }")
 
 
 class SqlParser:
@@ -132,13 +177,24 @@ class SqlParser:
     # dictionary of names
     names = { }
 
+    def p_program_head(self, t):
+        '''program : printString
+                | statement'''
+        t[0] = t[1]
+
+    def p_program_print(self, t):
+        'printString : PRINT OPENPAR STRING CLOSEPAR EOL'
+        print(t[3])
+
     def p_statement_assign(self, t):
-        'statement : NAME ASSIGN expression'
+        'statement : ID ASSIGN expression'
         names[t[1]] = t[3]
 
     def p_statement_expr(self, t):
         'statement : expression'
-        print(t[1])
+        print(t[1])  		
+
+
 
     def p_expression_binop(self, t):
         '''expression : expression PLUS expression
@@ -157,23 +213,24 @@ class SqlParser:
         t[0] = -t[2]
 
     def p_expression_group(self, t):
-        '''expression : OPENPAR expression CLOSEPAR
-                    | OPENCURLY expression CLOSECURLY
-                    | OPENBRACE expression CLOSEBRACE'''
+        'expression : OPENPAR expression CLOSEPAR'
+                  
         t[0] = t[2]
 
     def p_expression_number(self, t):
         '''expression : INT 
-		| FLOAT'''
+		          | FLOAT'''
         t[0] = t[1]
 
     def p_expression_name(self, t):
-        'expression : NAME'
+        '''expression : ID'''
         try:
             t[0] = names[t[1]]
         except LookupError:
             print("Undefined name '%s'" % t[1])
             t[0] = 0
+
+    #print(names[0:])
 
     def p_error(self, t):
         print("Syntax error at '%s'" % t.value)
