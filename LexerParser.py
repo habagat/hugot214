@@ -11,6 +11,7 @@ class SqlLexer:
         #'kamipa'       :   'WHILE',
         #'ibalik'       :   'RETURN',
         #'tayona'       :   'MAIN',
+        'ayokona'       :   'END',
         #'nbsb'         :   'READ',
         'pda'          :   'PRINT',
         #'paasa'        :   'FOR',
@@ -35,7 +36,7 @@ class SqlLexer:
         'INT','FLOAT', 'EOL','ID','STRING',
         'PLUS','MINUS','MUL','DIV','MOD','ASSIGN',
         'OPENPAR','CLOSEPAR',
-	#'OPENCURLY','CLOSECURLY','OPENBRACE','CLOSEBRACE'
+       #'OPENCURLY','CLOSECURLY','OPENBRACE','CLOSEBRACE'
        # 'CHARN','BOOLN','STRINGN','ID','COMMA',
     ] + list(reserved.values())
 
@@ -92,6 +93,7 @@ class SqlLexer:
     t_ASSIGN      =   r'='
     t_OPENPAR     =   r'\('
     t_CLOSEPAR    =   r'\)'
+
 
     # Ignored characters
     t_ignore = " \t"
@@ -152,7 +154,8 @@ class SqlLexer:
 
 # Build the lexer and try it out
 #m = SqlLexer()
-#m.build()           # Build the lexer
+#m.build() 
+#m.test("ayokona 0;")          # Build the lexer
 #m.test("pda () { x1 = [ 4 + 3 ] ; }")     # Test it
 #m.test("#\"hello\"") 
 #m.test("\"Hello World\"")
@@ -179,7 +182,8 @@ class SqlParser:
 
     def p_program_head(self, t):
         '''program : printString
-                | statement'''
+                | statement
+                | endprog'''
         t[0] = t[1]
 
     def p_program_print(self, t):
@@ -230,10 +234,16 @@ class SqlParser:
             print("Undefined name '%s'" % t[1])
             t[0] = 0
 
+
+    def p_program_end(self, t):
+        'endprog : END INT EOL'
+        if t[2] == 0 :  t[0] = 0
+        else:  print("Invalid return value")
+
     #print(names[0:])
 
     def p_error(self, t):
-        print("Syntax error at '%s'" % t.value)
+        print("Parser: Syntax error at '%s'" % t.value)
 
 
     def build(self, **kwargs):
