@@ -10,7 +10,7 @@ class SqlLexer:
         #'akona'        :   'ELSEIF',
         #'kamipa'       :   'WHILE',
         #'ibalik'       :   'RETURN',
-        #'tayona'       :   'MAIN',
+        'tayona'       :   'MAIN',
         'ayokona'       :   'END',
         #'nbsb'         :   'READ',
         'pda'          :   'PRINT',
@@ -36,7 +36,8 @@ class SqlLexer:
         'INT','FLOAT', 'EOL','ID','STRING',
         'PLUS','MINUS','MUL','DIV','MOD','ASSIGN',
         'OPENPAR','CLOSEPAR',
-       #'OPENCURLY','CLOSECURLY','OPENBRACE','CLOSEBRACE'
+        'OPENCURLY','CLOSECURLY',
+       #'OPENBRACE','CLOSEBRACE'
        # 'CHARN','BOOLN','STRINGN','ID','COMMA',
     ] + list(reserved.values())
 
@@ -81,8 +82,8 @@ class SqlLexer:
     #t_COMMA       =   r'\,'
     t_EOL	  =   r';'
     #t_QUOTE	  =   r'\"'
-    #t_OPENCURLY   =   r'\{'
-    #t_CLOSECURLY  =   r'\}'
+    t_OPENCURLY   =   r'\{'
+    t_CLOSECURLY  =   r'\}'
     #t_OPENBRACE   =   r'\['
     #t_CLOSEBRACE  =   r'\]'
     t_PLUS        =   r'\+'
@@ -98,6 +99,7 @@ class SqlLexer:
     # Ignored characters
     t_ignore = " \t"
 
+    '''
     literals = [ '{', '}' ]
 
     def t_lbrace(self, t):
@@ -109,7 +111,7 @@ class SqlLexer:
         r'\}'
         t.type = '}'      # Set token type to the expected literal
         return t
-
+    '''
 
     def t_COMMENT(self,t):
         r'\#.*'
@@ -179,6 +181,15 @@ class SqlParser:
     )
     # dictionary of names
     names = { }
+
+    def p_program_start_start(self, t):
+        '''progStart : programHeading OPENCURLY program CLOSECURLY
+                | programHeading'''
+        t[0] = 0
+
+    def p_program_main(self, t):
+        'programHeading : MAIN OPENPAR CLOSEPAR'
+        t[0] = 0
 
     def p_program_head(self, t):
         '''program : printString
