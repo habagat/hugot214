@@ -122,7 +122,7 @@ class SqlLexer:
         r'\n+'
         t.lexer.lineno += t.value.count("\n")
 
-    
+    '''
     # Compute column. 
     #     input is the input text string
     #     token is a token instance
@@ -132,12 +132,22 @@ class SqlLexer:
             last_cr = 0
         column = (token.lexpos - last_cr) + 1
         return column
+    '''
 
     def t_error(self,t):
         print("Illegal character '%s'" % t.value[0])
         t.lexer.skip(1)
-    
-        
+ 
+    ''' # EOF handling rule
+    def t_eof(self, t):
+        # Get more input (Example)
+        more = raw_input('... ')
+        if more:
+            self.lexer.input(more)
+            #return self.lexer.token()
+        return None   
+     '''
+
     # Build the lexer
     def build(self, **kwargs):
         self.lexer = lex.lex(module=self, **kwargs)
@@ -194,7 +204,8 @@ class SqlParser:
     def p_program_head(self, t):
         '''program : printString
                 | statement
-                | endprog'''
+                | endprog
+                | empty'''
         t[0] = t[1]
 
     def p_program_print(self, t):
@@ -244,6 +255,10 @@ class SqlParser:
         except LookupError:
             print("Undefined name '%s'" % t[1])
             t[0] = 0
+
+    def p_empty(self, t):
+        'empty :'
+        pass
 
 
     def p_program_end(self, t):
