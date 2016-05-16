@@ -15,6 +15,8 @@ class Main:
 		statement=statement.lower()
 		#statement=statement.replace(","," ")
 
+		
+		
 		if statement == 'quit':
 			break
 		else:
