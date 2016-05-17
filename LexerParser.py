@@ -1,7 +1,7 @@
 from ply import lex, yacc
 
 
-class SqlLexer:
+class Lexer:
     
 
     reserved = {
@@ -48,7 +48,7 @@ class SqlLexer:
 
     def t_ID(self, t):
         r'[a-zA-Z_][a-zA-Z_0-9]*'
-        t.type = SqlLexer.reserved.get(t.value,'ID')    # Check for reserved words
+        t.type = Lexer.reserved.get(t.value,'ID')    # Check for reserved words
         # redis is case sensitive in hash keys but we want the sql to be case insensitive,
         # so we lowercase identifiers 
         t.value = t.value.lower()
@@ -165,7 +165,7 @@ class SqlLexer:
     '''
 
 # Build the lexer and try it out
-#m = SqlLexer()
+#m = Lexer()
 #m.build() 
 #m.test("ayokona 0;")          # Build the lexer
 #m.test("pda () { x1 = [ 4 + 3 ] ; }")     # Test it
@@ -175,9 +175,9 @@ class SqlLexer:
 #m.test(" syapala() { \'Hi Universe!\' }")
 
 
-class SqlParser:
+class Parser:
 
-    tokens = SqlLexer.tokens
+    tokens = Lexer.tokens
 
     # Parsing Rules
 
@@ -220,8 +220,6 @@ class SqlParser:
         'statement : expression'
         print(t[1])  		
 
-
-
     def p_expression_binop(self, t):
         '''expression : expression PLUS expression
                   | expression MINUS expression
@@ -245,7 +243,7 @@ class SqlParser:
 
     def p_expression_number(self, t):
         '''expression : INT 
-		          | FLOAT'''
+		     | FLOAT'''
         t[0] = t[1]
 
     def p_expression_name(self, t):
