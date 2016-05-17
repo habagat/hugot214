@@ -16,8 +16,8 @@ class Lexer:
         'pda'          :   'PRINT',
         #'paasa'        :   'FOR',
         #'habang'       :   'DO',
-        #'solo'         :   'INT',
-        #'pafall'       :   'FLOAT',
+        'solo'         :   'INTN',
+        'pafall'       :   'FLOATN',
         #'feelingera'   :   'CHAR',
         #'assumera'     :   'STRING',
         #'friendzone'   :   'BOOLEAN',
@@ -167,6 +167,7 @@ class Lexer:
 # Build the lexer and try it out
 #m = Lexer()
 #m.build() 
+#m.test("int x")
 #m.test("ayokona 0;")          # Build the lexer
 #m.test("pda () { x1 = [ 4 + 3 ] ; }")     # Test it
 #m.test("#\"hello\"") 
@@ -194,13 +195,25 @@ class Parser:
     programlist =[]
 
     def p_program_start_start(self, t):
-        '''progStart : programHeading OPENCURLY statement endprog CLOSECURLY
+        '''progStart : programHeading OPENCURLY decl statement endprog CLOSECURLY
                 | programHeading'''
         t[0] = 0
 
     def p_program_main(self, t):
         'programHeading : MAIN OPENPAR CLOSEPAR'
         t[0] = 0
+
+    def p_program_decl(self, t):
+        '''decl : type ID EOL
+        		| empty'''
+        t[0] = t[1]
+
+
+    def p_program_type(self, t):
+        '''type : INTN
+        		| FLOATN'''
+        t[0] = t[1]
+
     '''
     def p_program_head(self, t):
         'program : printString
@@ -257,18 +270,17 @@ class Parser:
             print("Undefined name '%s'" % t[1])
             t[0] = 0
 
-    '''
+    
     def p_empty(self, t):
         'empty :'
         pass
-    '''
+   
 
     def p_program_end(self, t):
         'endprog : END INT EOL'
         if t[2] == 0 :  t[0] = 0
         else:  print("Invalid return value")
 
-    #print(names[0:])
 
     def p_error(self, t):
         print("Parser: Syntax error at '%s'" % t.value)

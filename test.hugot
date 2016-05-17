@@ -1,5 +1,7 @@
 
 tayona(){
+	solo x;
+
 	pda ("MABUHAY ANG Pinas!");
 	ayokona 0;
 }
