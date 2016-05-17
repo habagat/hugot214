@@ -1,0 +1,26 @@
+
+tayona(){
+	solo x = 5, z = 8, s = 3, t=2;
+	solo w = 4, r = 2;
+	pafall y = 1.1;
+	#feelingera x ;
+	#assumera x;
+	#friendzone x;
+
+    #r = 0;
+	#pda ("Achieve");
+	#pda ("1st");
+	#pda ("2nd");
+	#pda ("3rd");
+	#pda ("4th");
+	pda (r);
+	pda (w);
+	pda (x);
+	pda (y);
+	pda (z);
+	pda (x+10.2);
+
+
+	ayokona 0;
+}
+

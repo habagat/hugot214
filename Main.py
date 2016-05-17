@@ -4,7 +4,11 @@ from sys import *
 class Main:
 
 	def open_file(filename):
-		data = open(filename, "r").read()
+		if filename.endswith(".hgt"):
+			data = open(filename, "r").read()
+		else:
+			print("Invalid file type. File extension should be '.hgt'")
+			exit(0)
 		return data
 
 	statement = open_file(argv[1])
