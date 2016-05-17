@@ -5,6 +5,7 @@ tayona(){
 	#feelingera x ;
 	#assumera x;
 	#friendzone x;
+	#rolan 
 
 	#pda ("MABUHAY ANG Pinas!");
 	pda (x + 10);
