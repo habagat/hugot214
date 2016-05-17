@@ -1,8 +1,13 @@
 
 tayona(){
-	solo x;
+	solo x = 9;
+	#pafall x;
+	#feelingera x ;
+	#assumera x;
+	#friendzone x;
 
-	pda ("MABUHAY ANG Pinas!");
+	#pda ("MABUHAY ANG Pinas!");
+	x + 10;
 	ayokona 0;
 }
 

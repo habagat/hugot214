@@ -18,9 +18,9 @@ class Lexer:
         #'habang'       :   'DO',
         'solo'         :   'INTN',
         'pafall'       :   'FLOATN',
-        #'feelingera'   :   'CHAR',
-        #'assumera'     :   'STRING',
-        #'friendzone'   :   'BOOLEAN',
+        'feelingera'   :   'CHARN',
+        'assumera'     :   'STRINGN',
+        'friendzone'   :   'BOOLN',
         #'lovemosya'    :   'LT',
         #'lovekita'     :   'GT',
         #'maslovemosya' :   'LEQ',
@@ -175,6 +175,11 @@ class Lexer:
 #m.test("\'Hi Universe!\'")
 #m.test(" syapala() { \'Hi Universe!\' }")
 
+variableNames=[]
+
+# dictionary of names
+names = { }
+
 
 class Parser:
 
@@ -190,9 +195,6 @@ class Parser:
        # ('left', 'AND'),
        # ('left', 'EQ', 'NEQ', 'LT', 'GT')
     )
-    # dictionary of names
-    names = { }
-    programlist =[]
 
     def p_program_start_start(self, t):
         '''progStart : programHeading OPENCURLY decl statement endprog CLOSECURLY
@@ -206,35 +208,35 @@ class Parser:
     def p_program_decl(self, t):
         '''decl : type ID EOL
         		| empty'''
-        t[0] = t[1]
+        variableNames.append(t[2])
+        print(variableNames)
 
+    def p_program_decl_value(self, t):
+        'decl : type ID ASSIGN expression EOL'
+        #'decl : type statement EOL'
+        names[t[2]] = t[4]
+       # variableNames.append(t[2])
+       # print(variableNames)
 
     def p_program_type(self, t):
         '''type : INTN
-        		| FLOATN'''
+        		| FLOATN
+        		| CHARN
+        		| STRINGN
+        		| BOOLN'''
         t[0] = t[1]
-
-    '''
-    def p_program_head(self, t):
-        'program : printString
-                | statement
-                | endprog
-                | reprogram
-                | empty'
-        t[0] = t[1]
-    '''
 
     def p_program_print(self, t):
         'statement : PRINT OPENPAR STRING CLOSEPAR EOL'
         print(t[3])
 
     def p_statement_assign(self, t):
-        'statement : ID ASSIGN expression'
-        t[1] = t[3]
+        'statement : ID ASSIGN expression EOL'
+        names[t[1]] = t[3]
 
     def p_statement_expr(self, t):
-        'statement : expression'
-        print(t[1])  		
+        'statement : expression EOL'
+        print(t[1])     # prints the value ofe evaluated expression		
 
     def p_expression_binop(self, t):
         '''expression : expression PLUS expression
