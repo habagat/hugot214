@@ -26,7 +26,7 @@ class Lexer:
         #'maslovemosya' :   'LEQ',
         #'maslovekita'  :   'GEQ',
         #'pataskami'    :   'EQ',
-        #'lamangsita'   :   'NEQ',
+        #'lamangsiya'   :   'NEQ',
         #'basted'       :   'NOT',
         #'ot'           :   'OR',
         #'at'           :   'AND',
@@ -37,8 +37,8 @@ class Lexer:
         'PLUS','MINUS','MUL','DIV','MOD','ASSIGN',
         'OPENPAR','CLOSEPAR',
         'OPENCURLY','CLOSECURLY',
+        'COMMA',
        #'OPENBRACE','CLOSEBRACE'
-       # 'CHARN','BOOLN','STRINGN','ID','COMMA',
     ] + list(reserved.values())
 
 
@@ -79,8 +79,8 @@ class Lexer:
         return t
     
     # Tokens
-    #t_COMMA       =   r'\,'
-    t_EOL	  =   r';'
+    t_COMMA       =   r'\,'
+    t_EOL	      =   r';'
     #t_QUOTE	  =   r'\"'
     t_OPENCURLY   =   r'\{'
     t_CLOSECURLY  =   r'\}'
@@ -167,7 +167,7 @@ class Lexer:
 # Build the lexer and try it out
 #m = Lexer()
 #m.build() 
-#m.test("int x")
+#m.test("solo x = 4")
 #m.test("ayokona 0;")          # Build the lexer
 #m.test("pda () { x1 = [ 4 + 3 ] ; }")     # Test it
 #m.test("#\"hello\"") 
@@ -176,10 +176,10 @@ class Lexer:
 #m.test(" syapala() { \'Hi Universe!\' }")
 
 variableNames=[]
-
+statementlist=[]
 # dictionary of names
 names = { }
-
+i = 0
 
 class Parser:
 
@@ -197,8 +197,7 @@ class Parser:
     )
 
     def p_program_start_start(self, t):
-        '''progStart : programHeading OPENCURLY decl statement endprog CLOSECURLY
-                | programHeading'''
+        'progStart : programHeading OPENCURLY decl statement endprog CLOSECURLY'
         t[0] = 0
 
     def p_program_main(self, t):
@@ -206,16 +205,44 @@ class Parser:
         t[0] = 0
 
     def p_program_decl(self, t):
-        '''decl : type ID EOL
+        '''decl : type ID nextdecl EOL decl
         		| empty'''
         #variableNames.append(t[2])
         #print(variableNames)
 
     def p_program_decl_value(self, t):
-        'decl : type ID ASSIGN expression EOL'
+        'decl : type ID ASSIGN value nextdecl EOL decl '
+        #print(variableNames)
+        #variableNames.append(t[2])
+        #for j in range(0, len(variableNames)):
+            #if variableNames[j]==t[2]: 
+               # print(variableNames[j])
+               # print("variable already exist")
+               # break
+            #else:
+        variableNames.append(t[2]) 
         names[t[2]] = t[4]
-       # variableNames.append(t[2])
-       # print(variableNames)
+                
+        #print(names)
+
+    def p_program_nextdecl(self, t):
+        'nextdecl : COMMA ID nextdecl'
+        variableNames.append(t[2])       
+
+    def p_program_declassign(self, t):
+        'nextdecl : COMMA ID ASSIGN value nextdecl '
+        variableNames.append(t[2])  
+        names[t[2]]=t[4]
+
+    def p_program_emptydecl(self, t):
+        'nextdecl : empty'
+
+
+
+    def p_program_number(self, t):
+        '''value : INT 
+		     | FLOAT'''
+        t[0] = t[1]
 
     def p_program_type(self, t):
         '''type : INTN
@@ -226,18 +253,29 @@ class Parser:
         t[0] = t[1]
 
     def p_program_print(self, t):
-        '''statement : PRINT OPENPAR STRING CLOSEPAR EOL
-        		| PRINT OPENPAR statement CLOSEPAR EOL'''
-        print(t[3])
+        '''statement : PRINT OPENPAR STRING CLOSEPAR EOL statement  
+        		| PRINT OPENPAR statement CLOSEPAR EOL statement'''
+        #state = i + 1
+        statementlist.append(t[3])
+        #print(t[3])
+        #print(statementlist)
+        #print(state)
+        
+
 
     def p_statement_assign(self, t):
         'statement : ID ASSIGN expression EOL'
         names[t[1]] = t[3]
 
+
+    def p_statement_emptyState(self, t):
+        'statement : empty'
+        pass
+
     def p_statement_expr(self, t):
         'statement : expression'
         t[0] = t[1]
-        #print(t[1])     # prints the value ofe evaluated expression		
+        #print(t[1])     # prints the value of evaluated expression		
 
     def p_expression_binop(self, t):
         '''expression : expression PLUS expression
@@ -281,6 +319,14 @@ class Parser:
 
     def p_program_end(self, t):
         'endprog : END INT EOL'
+        #print(statementlist)
+        #print(names)
+        x = len(statementlist)
+
+        for i in range(0, x):
+            print(statementlist[x-1])
+            x = x-1
+
         if t[2] == 0 :  t[0] = 0
         else:  print("Invalid return value")
 
@@ -293,3 +339,4 @@ class Parser:
         self.parser = yacc.yacc(module=self, **kwargs)
         return self.parser
 
+    
