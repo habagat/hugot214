@@ -7,7 +7,7 @@ tayona(){
 	#friendzone x;
 
 	#pda ("MABUHAY ANG Pinas!");
-	x + 10;
+	pda (x + 10);
 	ayokona 0;
 }
 

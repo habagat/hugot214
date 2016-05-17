@@ -208,12 +208,11 @@ class Parser:
     def p_program_decl(self, t):
         '''decl : type ID EOL
         		| empty'''
-        variableNames.append(t[2])
-        print(variableNames)
+        #variableNames.append(t[2])
+        #print(variableNames)
 
     def p_program_decl_value(self, t):
         'decl : type ID ASSIGN expression EOL'
-        #'decl : type statement EOL'
         names[t[2]] = t[4]
        # variableNames.append(t[2])
        # print(variableNames)
@@ -227,7 +226,8 @@ class Parser:
         t[0] = t[1]
 
     def p_program_print(self, t):
-        'statement : PRINT OPENPAR STRING CLOSEPAR EOL'
+        '''statement : PRINT OPENPAR STRING CLOSEPAR EOL
+        		| PRINT OPENPAR statement CLOSEPAR EOL'''
         print(t[3])
 
     def p_statement_assign(self, t):
@@ -235,8 +235,9 @@ class Parser:
         names[t[1]] = t[3]
 
     def p_statement_expr(self, t):
-        'statement : expression EOL'
-        print(t[1])     # prints the value ofe evaluated expression		
+        'statement : expression'
+        t[0] = t[1]
+        #print(t[1])     # prints the value ofe evaluated expression		
 
     def p_expression_binop(self, t):
         '''expression : expression PLUS expression
