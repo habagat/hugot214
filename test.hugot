@@ -1,5 +1,6 @@
 
 tayona(){
-	pda ("MABUHAY ANG pilipinas!");
+	pda ("MABUHAY ANG Pinas!");
+	ayokona 0;
 }
 

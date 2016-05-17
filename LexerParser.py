@@ -191,30 +191,33 @@ class Parser:
     )
     # dictionary of names
     names = { }
+    programlist =[]
 
     def p_program_start_start(self, t):
-        '''progStart : programHeading OPENCURLY program CLOSECURLY
+        '''progStart : programHeading OPENCURLY statement endprog CLOSECURLY
                 | programHeading'''
         t[0] = 0
 
     def p_program_main(self, t):
         'programHeading : MAIN OPENPAR CLOSEPAR'
         t[0] = 0
-
+    '''
     def p_program_head(self, t):
-        '''program : printString
+        'program : printString
                 | statement
                 | endprog
-                | empty'''
+                | reprogram
+                | empty'
         t[0] = t[1]
+    '''
 
     def p_program_print(self, t):
-        'printString : PRINT OPENPAR STRING CLOSEPAR EOL'
+        'statement : PRINT OPENPAR STRING CLOSEPAR EOL'
         print(t[3])
 
     def p_statement_assign(self, t):
         'statement : ID ASSIGN expression'
-        names[t[1]] = t[3]
+        t[1] = t[3]
 
     def p_statement_expr(self, t):
         'statement : expression'
@@ -254,10 +257,11 @@ class Parser:
             print("Undefined name '%s'" % t[1])
             t[0] = 0
 
+    '''
     def p_empty(self, t):
         'empty :'
         pass
-
+    '''
 
     def p_program_end(self, t):
         'endprog : END INT EOL'
