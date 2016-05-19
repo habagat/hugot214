@@ -1,0 +1,10 @@
+
+tayona(){
+	solo x;
+
+	pda("Enter input:");
+	nbsb(x);
+    
+	ayokona 0;
+}
+
