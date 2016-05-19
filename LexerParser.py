@@ -12,7 +12,7 @@ class Lexer:
         #'ibalik'       :   'RETURN',
         'tayona'       :   'MAIN',
         'ayokona'       :   'END',
-        #'nbsb'         :   'READ',
+        'nbsb'         :   'READ',
         'pda'          :   'PRINT',
         #'paasa'        :   'FOR',
         #'habang'       :   'DO',
@@ -179,7 +179,7 @@ variableNames=[]
 statementlist=[]
 # dictionary of names
 names = { }
-i = 0
+
 
 class Parser:
 
@@ -195,7 +195,7 @@ class Parser:
        # ('left', 'AND'),
        # ('left', 'EQ', 'NEQ', 'LT', 'GT')
     )
-
+	
     def p_program_start_start(self, t):
         'progStart : programHeading OPENCURLY decl statement endprog CLOSECURLY'
         t[0] = 0
@@ -205,10 +205,13 @@ class Parser:
         t[0] = 0
 
     def p_program_decl(self, t):
-        '''decl : type ID nextdecl EOL decl
-        		| empty'''
-        #variableNames.append(t[2])
-        #print(variableNames)
+        'decl : type ID nextdecl EOL decl'
+        variableNames.append(t[2])
+        names[t[2]]= ''
+        #print(names)
+
+    def p_program_vempty(self, t):
+    	'decl : empty'
 
     def p_program_decl_value(self, t):
         'decl : type ID ASSIGN value nextdecl EOL decl '
@@ -223,16 +226,18 @@ class Parser:
         variableNames.append(t[2]) 
         names[t[2]] = t[4]
                 
-        #print(names)
+ 
 
     def p_program_nextdecl(self, t):
         'nextdecl : COMMA ID nextdecl'
-        variableNames.append(t[2])       
+        variableNames.append(t[2])
+        names[t[2]]= ''       
 
     def p_program_declassign(self, t):
         'nextdecl : COMMA ID ASSIGN value nextdecl '
         variableNames.append(t[2])  
         names[t[2]]=t[4]
+       
 
     def p_program_emptydecl(self, t):
         'nextdecl : empty'
@@ -252,6 +257,14 @@ class Parser:
         		| BOOLN'''
         t[0] = t[1]
 
+    #def p_program_assignvar(self, t):
+    #	'assignvar : ID ASSIGN expression EOL assignvar'
+   # 	names[t[1]] = t[3]
+
+    #def p_program_varempty(self, t):
+    #	'assignvar : empty'
+  
+
     def p_program_print(self, t):
         '''statement : PRINT OPENPAR STRING CLOSEPAR EOL statement  
         		| PRINT OPENPAR statement CLOSEPAR EOL statement'''
@@ -260,11 +273,23 @@ class Parser:
         #print(t[3])
         #print(statementlist)
         #print(state)
-        
+     
+    def p_program_input(self, t):
+    	'statement : READ OPENPAR ID CLOSEPAR EOL statement'
+    	#x = input() 
+    	statementlist.append("SCANVALUE")
+    	names[t[3]] = 'SCANVAL' 
+    	#statementlist.append(t[3])
+    #def p_program_if(self, t):
+    #	'statement : FOR OPENPAR logicOp CLOSEPAR OPENCURLY statement CLOSECURLY'
 
+    #def p_program_cond(self, t):
+    #	'logicOp : ID EQ ID'
 
     def p_statement_assign(self, t):
-        'statement : ID ASSIGN expression EOL'
+        'statement : ID ASSIGN expression EOL statement'
+        #print(t[3])
+        #if(names[t[1]] == ''):
         names[t[1]] = t[3]
 
 
@@ -308,8 +333,10 @@ class Parser:
         try:
             t[0] = names[t[1]]
         except LookupError:
+            #names[t[1]] = 0
             print("Undefined name '%s'" % t[1])
             t[0] = 0
+            #exit(0)
 
     
     def p_empty(self, t):
@@ -324,7 +351,10 @@ class Parser:
         x = len(statementlist)
 
         for i in range(0, x):
-            print(statementlist[x-1])
+            if(statementlist[x-1]=='SCANVALUE'):
+            	input()
+            else: print(statementlist[x-1])
+           
             x = x-1
 
         if t[2] == 0 :  t[0] = 0
