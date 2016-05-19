@@ -1,0 +1,14 @@
+
+tayona(){
+	solo x = 1, y = 100;
+	pafall z = 1.5;
+
+	#pda("The output is ");
+	#pda(z * 2 + 1 % y / 2);
+	pda(x + (2 -x));
+	pda(-x);
+	pda(-z + 3);
+ 
+	ayokona 0;
+}
+
