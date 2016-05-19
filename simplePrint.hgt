@@ -1,0 +1,11 @@
+
+tayona(){
+
+	pda("Buhay ka pa!!!");
+	pda("Wag kang sumuko!!!");
+	pda("Push pa more!!!!");
+	pda("Matatapos din to. (-_-)");
+ 
+	ayokona 0;
+}
+
