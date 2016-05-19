@@ -1,0 +1,10 @@
+
+tayona(){
+	solo x, y = 100;
+
+	pda("The value of x");
+	pda(x);
+ 
+	ayokona 0;
+}
+
